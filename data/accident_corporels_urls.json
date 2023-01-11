@@ -100,5 +100,8 @@
         "description-des-bases-de-donnees-onisr-annees-2005-a-2020":"https://www.data.gouv.fr/fr/datasets/r/21e46f4e-fa29-40bb-9ec8-905e41e041aa",
         "description-des-bases-de-donnees-onisr-annees-2005-a-2018":"https://www.data.gouv.fr/fr/datasets/r/8d4df329-bbbb-434c-9f1f-596d78ad529f",
         "Base-de-donnees-accidents-sur-6-annees-avec-informations-de-geolocalisation":"https://www.data.gouv.fr/fr/datasets/r/cd8a4150-ea45-4de0-b5b9-841b9aa8c7d7"
+    },
+    "ammenagement" : {
+        "2023-0101" : "https://www.data.gouv.fr/fr/datasets/r/a92c8ac6-e004-478a-991d-08cd4a3f39cc"
     }
 }

@@ -5,4 +5,11 @@
 .DS_Store
 
 # Cache files
-*.pyc
+*.pyc*
+
+#venv
+.venv/*
+
+#data
+*.csv
+*.geojson
