@@ -1,0 +1,657 @@
+{
+    "Caracteristiques":{
+        "Num_Acc": {
+            "Name": "Numéro d'accident",
+            "Description": "Numéro d'accident",
+            "Catégories": null
+        },
+        "jour": {
+            "Name": "Jour",
+            "Description": "Jour",
+            "Catégories": null
+        },
+        "mois": {
+            "Name": "Mois",
+            "Description": "Mois",
+            "Catégories": null
+        },
+        "an": {
+            "Name": "Année",
+            "Description": "Année",
+            "Catégories": null
+        },
+        "hrmn": {
+            "Name": "Heure et minute",
+            "Description": "Heure et minute de l'accident",
+            "Catégories": null
+        },
+        "lum": {
+            "Name": "Lumière",
+            "Description": "Conditions d'éclairage dans lesquelles l'accident s'est produit",
+            "Catégories": {
+                "1": "Plein jour",
+                "2": "Crépuscule ou aube",
+                "3": "Nuit sans éclairage public",
+                "4": "Nuit avec éclairage public non allumé",
+                "5": "Nuit avec éclairage public allumé"
+            }
+        },
+        "dep": {
+            "Name": "Département",
+            "Description": "Département Code INSEE",
+            "Catégories": null
+        },
+        "com": {
+            "Name": "Commune",
+            "Description": "Commune Code INSEE",
+            "Catégories": null
+        },
+        "agg": {
+            "Name": "Agglomération",
+            "Description": "Localisation",
+            "Catégories": {
+                "1": "Hors agglomération",
+                "2": "Agglomération"
+            }
+        },
+        "int": {
+            "Name": "Intersection",
+            "Description": "Intersection",
+            "Catégories": {
+                "1": "Hors intersection",
+                "2": "Intersection en X",
+                "3": "Intersection en T",
+                "4": "Intersection en Y",
+                "5": "Intersection à plus de 4 branches",
+                "6": "Giratoire",
+                "7": "Place",
+                "8": "Passage à niveau",
+                "9": "Autre intersection"
+            }
+        },
+        "atm": {
+            "Name": "Atmosphère",
+            "Description": "Conditions Atmosphère",
+            "Catégories": {
+                "-1": "Non renseigné",
+                "1": "Normale",
+                "2": "Pluie légère",
+                "3": "Pluie forte",
+                "4": "Neige - grêle",
+                "5": "Brouillard - fumée",
+                "6": "Vent fort - tempête",
+                "7": "Temps éblouissant",
+                "8": "Temps couvert",
+                "9": "Autre"
+            }
+        },
+        "col": {
+            "Name": "Collision",
+            "Description": "Collision",
+            "Catégories": {
+                "-1": "Non renseigné",
+                "1": "Deux véhicules - frontale",
+                "2": "Deux véhicules – par l'arrière",
+                "3": "Deux véhicules – par le coté",
+                "4": "Trois véhicules et plus – en chaîne",
+                "5": "Trois véhicules et plus - collisions multiples",
+                "6": "Autre collision",
+                "7": "Sans collision"
+            }
+        },
+        "adr": {
+            "Name": "Adresse postale (en agg)",
+            "Description": "Adresse",
+            "Catégories": null
+        },
+        "gps": {
+            "Name": "GPS",
+            "Description": "GPS",
+            "Catégories": null
+        },
+        "lat": {
+            "Name": "Latitude",
+            "Description": "Latitude",
+            "Catégories": null
+        },
+        "long": {
+            "Name": "Longitude",
+            "Description": "Longitude",
+            "Catégories": null
+        }
+    },
+    "Usagers":{
+        "Num_Acc": {
+            "Name": "Numéro d'accident",
+            "Description": "Numéro d'accident",
+            "Catégories": null
+        },
+        "id_usager": {
+            "Name": "Identifiant usager",
+            "Description": "Identifiant usager",
+            "Catégories": null
+        },
+        "id_vehicule":{
+            "Name": "Identifiant véhicule",
+            "Description": "Identifiant véhicule",
+            "Catégories": null
+        },
+        "num_vehi": {
+            "Name": "Numéro véhicule",
+            "Description": "Numéro véhicule",
+            "Catégories": null
+        },
+        "place": {
+            "Name": "Place",
+            "Description": "Place occupée par l'usager dans le véhicule",
+            "Catégories": {
+                "1": "Conducteur",
+                "2": "Passager",
+                "3": "Piéton",
+                "4": "Cycliste",
+                "5": "Motard 50cc et moins",
+                "6": "Motard > 50cc",
+                "7": "Autre usager",
+                "8": "Sans objet"
+            }
+        },
+        "catu": {
+            "Name": "Catégorie d'usager",
+            "Description": "Catégorie d'usager",
+            "Catégories": {
+                "1": "Conducteur",
+                "2": "Passager",
+                "3": "Piéton",
+                "4": "Cycliste",
+                "5": "Motard 50cc et moins",
+                "6": "Motard > 50cc",
+                "7": "Autre usager",
+                "8": "Sans objet"
+            }
+        },
+        "grav": {
+            "Name": "Gravité",
+            "Description": "Gravité de l'accident",
+            "Catégories": {
+                "0": "Indemne",
+                "1": "Blessé léger",
+                "2": "Blessé hospitalisé",
+                "3": "Tué"
+            }
+        },
+        "sexe": {
+            "Name": "Sexe",
+            "Description": "Sexe de l'usager",
+            "Catégories": {
+                "1": "Homme",
+                "2": "Femme"
+            }
+        },
+        "an_nais": {
+            "Name": "Année de naissance",
+            "Description": "Année de naissance",
+            "Catégories": null
+        },
+        "trajet": {
+            "Name": "Trajet",
+            "Description": "Trajet de l'usager",
+            "Catégories": {
+                "-1": "Non renseigné",
+                "0": "Non renseigné",
+                "1": "Domicile – travail",
+                "2": "Domicile – école",
+                "3": "Courses – achats",
+                "4": "Utilisation professionnelle",
+                "5": "Promenade – loisirs",
+                "9": "Autre"
+            }
+        },
+        "secu1": {
+            "Name": "Sécurité",
+            "Description": "Sécurité de l'usager",
+            "Catégories":{
+                "-1": "Non renseigné",
+                "0": "Aucun équipement",
+                "1": "Ceinture",
+                "2": "Casque",
+                "3": "Dispositif enfants",
+                "4": "Gilet réfléchissant",
+                "5": "Airbag (2RM/3RM)",
+                "6": "Gants (2RM/3RM)",
+                "7": "Gants + Airbag (2RM/3RM)",
+                "8": "Non déterminable",
+                "9": "Autre"
+            }
+        },
+        "secu2":{
+            "Name": "Sécurité",
+            "Description": "Sécurité de l'usager",
+            "Catégories":{
+                "-1": "Non renseigné",
+                "0": "Aucun équipement",
+                "1": "Ceinture",
+                "2": "Casque",
+                "3": "Dispositif enfants",
+                "4": "Gilet réfléchissant",
+                "5": "Airbag (2RM/3RM)",
+                "6": "Gants (2RM/3RM)",
+                "7": "Gants + Airbag (2RM/3RM)",
+                "8": "Non déterminable",
+                "9": "Autre"
+            }
+        },
+        "secu3":{
+            "Name": "Sécurité",
+            "Description": "Sécurité de l'usager",
+            "Catégories":{
+                "-1": "Non renseigné",
+                "0": "Aucun équipement",
+                "1": "Ceinture",
+                "2": "Casque",
+                "3": "Dispositif enfants",
+                "4": "Gilet réfléchissant",
+                "5": "Airbag (2RM/3RM)",
+                "6": "Gants (2RM/3RM)",
+                "7": "Gants + Airbag (2RM/3RM)",
+                "8": "Non déterminable",
+                "9": "Autre"
+            }
+        },
+        "locp":{
+            "Name": "Localisation",
+            "Description": "Localisation de l'usager",
+            "Catégories":{
+                "-1": "Non renseigné",
+                "0": "Sans objet",
+                "1": "Sur chaussée",
+                "2": "Sur passage piéton",
+                "3": "Sur trottoir",
+                "4": "Sur accotement",
+                "5": "Sur refuge ou BAU",
+                "6": "Sur contre allée",
+                "7": "Inconnue"
+            }
+        },
+        "actp":{
+            "Name": "Action du piéton",
+            "Description": "Action du piéton",
+            "Catégories":{
+                "-1": "Non renseigné",
+                "0": "Non renseigné ou sans objet",
+                "1": "Sens véhicule heurtant",
+                "2": "Sens inverse du véhicule",
+                "3": "Traversant",
+                "4": "Masqué",
+                "5": "Jouant – courant",
+                "6": "Avec animal",
+                "9": "Autre",
+                "A": "Monte/descend du véhicule",
+                "B": "Inconnue"
+            }
+        },
+        "etatp":{
+            "Name": "Etat du piéton",
+            "Description": "ette variable permet de préciser si le piéton accidenté était seul ou non",
+            "Catégories":{
+                "-1": "Non renseigné",
+                "1": "Seul",
+                "2": "Accompagne",
+                "3": "En groupe"
+            }
+        }
+    },
+    "lieux":{
+        "Num_Acc": {
+            "Name": "Numéro d'accident",
+            "Description": "Numéro d'accident",
+            "Catégories": null
+        },
+        "id_lieu": {
+            "Name": "Identifiant du lieu",
+            "Description": "Identifiant du lieu",
+            "Catégories": null
+        },
+        "Num_Voie": {
+            "Name": "Numéro de voie",
+            "Description": "Numéro de voie",
+            "Catégories": null
+        },
+        "catr": {
+            "Name": "Catégorie de route",
+            "Description": "Catégorie de route",
+            "Catégories": {
+                "-1": "Non renseigné",
+                "1": "Autoroute",
+                "2": "Route nationale",
+                "3": "Route Départementale",
+                "4": "Voie Communales",
+                "5": "Hors réseau public",
+                "6": "Parc de stationnement ouvert à la circulation publique",
+                "7": "Routes de métropole urbaine",
+                "9": "Autre"
+            }
+        },
+        "voie": {
+            "Name": "Voie",
+            "Description": "Voie",
+            "Catégories": null
+        },
+        "V1": {
+            "Name": "Voie",
+            "Description": "Voie",
+            "Catégories": null
+        },
+        "V2": {
+            "Name": "Voie",
+            "Description": "Voie",
+            "Catégories": null
+        },
+        "circ": {
+            "Name": "Circulation",
+            "Description": "Circulation",
+            "Catégories": {
+                "-1": "Non renseigné",
+                "1": "A sens unique",
+                "2": "Bidirectionnelle",
+                "3": "A chaussées séparées",
+                "4": "Avec voies d'affectation variable"
+            }
+        },
+        "nbv": {
+            "Name": "Nombre de voies",
+            "Description": "Nombre de voies",
+            "Catégories": null
+        },
+        "vosp": {
+            "Name": "Voie spéciale",
+            "Description": "Voie spéciale",
+            "Catégories": {
+                "-1": "Non renseigné",
+                "0": "Sans objet",
+                "1": "Piste cyclable",
+                "2": "Bande cyclable",
+                "3": "Voie réservée"
+            }
+        },
+        "prof":{
+            "Name": "Profil",
+            "Description": "Profil",
+            "Catégories":{
+                "-1": "Non renseigné",
+                "1": "Plat",
+                "2": "Pente",
+                "3": "Sommet de côte",
+                "4": "Bas de côte"
+            }
+        },
+        
+        "pr": {
+            "Name": "Profile",
+            "Description": "Numéro du PR de rattachement (numéro de la borne amont).",
+            "Catégories": null
+        },
+        "pr1":{
+            "Name": "Profile",
+            "Description": "Numéro du PR de rattachement (numéro de la borne amont).",
+            "Catégories":null
+        },
+        "plan":{
+            "Name":"Plan",
+            "Description":"Plan",
+            "Catégories":{
+                "-1":"Non renseigné",
+                "1":"Partie rectiligne",
+                "2":"En courbe à gauche",
+                "3":"En courbe à droite",
+                "4":"En « S »"
+            }
+        },
+        "lartpc":{
+            "Name":"Largeur de la chaussée",
+            "Description":"Largeur de la chaussée",
+            "Catégories":null
+        },
+        "larrout":{
+            "Name":"Largeur de la chaussée",
+            "Description":"Largeur de la chaussée",
+            "Catégories":null
+        },
+        "surf":{
+            "Name":"Surface",
+            "Description":"Surface",
+            "Catégories":{
+                "-1":"Non renseigné",
+                "1":"Normale",
+                "2":"Mouillée",
+                "3":"Flaques",
+                "4":"Inondée",
+                "5":"Enneigée",
+                "6":"Boue",
+                "7":"Verglacée",
+                "8":"Corps gras - huile",
+                "9":"Autre"
+            }
+        },
+        "infra":{
+            "Name":"Infrastructure",
+            "Description":"Infrastructure",
+            "Catégories":{
+                "-1":"Non renseigné",
+                "0":"Aucun",
+                "1":"Souterrain - tunnel",
+                "2":"Pont - autopont",
+                "3":"Bretelle d'échangeur ou de raccordement",
+                "4":"Voie ferrée",
+                "5":"Carrefour aménagé",
+                "6":"Zone piétonne",
+                "7":"Zone de péage",
+                "8":"Chantier",
+                "9":"Autres"
+            }
+        },
+        "situ":{
+            "Name":"Situation",
+            "Description":"Situation",
+            "Catégories":{
+                "-1":"Non renseigné",
+                "0":"Aucun",
+                "1":"Sur chaussée",
+                "2":"Sur bande d'arrêt d'urgence",
+                "3":"Sur accotement",
+                "4":"Sur trottoir",
+                "5":"Sur piste cyclable",
+                "6":"Sur autre voie spéciale",
+                "8":"Autres"
+            }
+        },
+        "vma":{
+            "Name":"Vitesse maximale autorisée",
+            "Description":"Vitesse maximale autorisée",
+            "Catégories":null
+        }
+    },
+    "vehicules":{
+        "Num_Acc":{
+            "Name": "Numéro d'accident",
+            "Description": "Numéro d'accident",
+            "Catégories": null
+        },
+        "id_vehicule":{
+            "Name": "Identifiant du véhicule",
+            "Description": "Identifiant du véhicule",
+            "Catégories": null
+        },
+        "Num_Veh":{
+            "Name": "Numéro du véhicule",
+            "Description": "Numéro du véhicule",
+            "Catégories": null
+        },
+        "senc":{
+            "Name": "Sens de circulation",
+            "Description": "Sens de circulation",
+            "Catégories":{
+                "-1": "Non renseigné",
+                "0": "Inconnue",
+                "1": "PK ou PR ou numéro d'adresse postale croissant",
+                "2": "PK ou PR ou numéro d'adresse postale décroissant",
+                "3": "Absence de repère"
+            }
+        },
+        "catv":{
+            "Name": "Catégorie de véhicule",
+            "Description": "Catégorie de véhicule",
+            "Catégories":{
+                "-1": "Non renseigné",
+                "0": "Indéterminable",
+                "1": "Bicyclette",
+                "2": "Cyclomoteur <50cm3",
+                "3": "Voiturette (Quadricycle à moteur carrossé) (anciennement \"voiturette ou tricycle à moteur\")",
+                "4": "Référence inutilisée depuis 2006 (scooter immatriculé)",
+                "5": "Référence inutilisée depuis 2006 (motocyclette)",
+                "6": "Référence inutilisée depuis 2006 (side-car)",
+                "7": "VL seul",
+                "8": "Référence inutilisée depuis 2006 (VL + caravane)",
+                "9": "Référence inutilisée depuis 2006 (VL + remorque)",
+                "10": "VU seul 1,5T <= PTAC <= 3,5T avec ou sans remorque (anciennement VU seul 1,5T <= PTAC <= 3,5T)",
+                "11": "Référence inutilisée depuis 2006 (VU (10) + caravane)",
+                "12": "Référence inutilisée depuis 2006 (VU (10) + remorque)",
+                "13": "PL seul 3,5T <PTCA <= 7,5T",
+                "14": "PL seul > 7,5T",
+                "15": "PL > 3,5T + remorque",
+                "16": "Tracteur routier seul",
+                "17": "Tracteur routier + semi-remorque",
+                "18": "Référence inutilisée depuis 2006 (transport en commun)",
+                "19": "Référence inutilisée depuis 2006 (tramway)",
+                "20": "Engin spécial",
+                "21": "Tracteur agricole",
+                "30": "Scooter < 50 cm3",
+                "31": "Motocyclette > 50 cm3 et <= 125 cm3",
+                "32": "Scooter > 50 cm3 et <= 125 cm3",
+                "33": "Motocyclette > 125 cm3",
+                "34": "Scooter > 125 cm3",
+                "35": "Quad léger <= 50 cm3 (Quadricycle à moteur non carrossé)",
+                "36": "Quad lourd > 50 cm3 (Quadricycle à moteur non carrossé)",
+                "37": "Autobus",
+                "38": "Autocar",
+                "39": "Train",
+                "40": "Tramway",
+                "41": "3RM <= 50 cm3",
+                "42": "3RM > 50 cm3 <= 125 cm3",
+                "43": "3RM > 125 cm3",
+                "50": "EDP à moteur",
+                "60": "EDP sans moteur",
+                "80": "VAE",
+                "99": "Autre véhicule"
+            }
+        },
+        "obs":{
+            "Name": "Obstacle fixe heurté",
+            "Description": "Obstacle fixe heurté",
+            "Catégories":{
+                "-1": "Non renseigné",
+                "0": "Sans objet",
+                "1": "Véhicule en stationnement",
+                "2": "Arbre",
+                "3": "Glissière métallique",
+                "4": "Glissière béton",
+                "5": "Autre glissière",
+                "6": "Bâtiment, mur, pile de pont",
+                "7": "Support de signalisation verticale ou poste d'appel d'urgence",
+                "8": "Poteau",
+                "9": "Mobilier urbain",
+                "10": "Parapet",
+                "11": "Ilot, refuge, borne haute",
+                "12": "Bordure de trottoir",
+                "13": "Fossé, talus, paroi rocheuse",
+                "14": "Autre obstacle fixe sur chaussée",
+                "15": "Autre obstacle fixe sur trottoir ou accotement",
+                "16": "Sortie de chaussée sans obstacle",
+                "17": "Buse tête d'aqueduc"
+            }
+        },
+        "obsm":{
+            "Name": "Obstacle mobile heurté",
+            "Description": "Obstacle mobile heurté",
+            "Catégories":{
+                "-1": "Non renseigné",
+                "0": "Aucun",
+                "1": "Piéton",
+                "2": "Véhicule",
+                "4": "Véhicule sur rail",
+                "5": "Animal domestique",
+                "6": "Animal sauvage",
+                "9": "Autre"
+            }
+        },
+        "choc":{
+            "Name": "Point de choc initial",
+            "Description": "Point de choc initial",
+            "Catégories":{
+                "-1": "Non renseigné",
+                "0": "Aucun",
+                "1": "Avant",
+                "2": "Avant droit",
+                "3": "Avant gauche",
+                "4": "Arrière",
+                "5": "Arrière droit",
+                "6": "Arrière gauche",
+                "7": "Côté droit",
+                "8": "Côté gauche",
+                "9": "Chocs multiples (tonneaux)"
+            }
+        },
+        "manv":{
+            "Name": "Manoeuvre effectuée par le conducteur",
+            "Description": "Manoeuvre effectuée par le conducteur",
+            "Catégories":{
+                "-1": "Non renseigné",
+                "0": "Inconnue",
+                "1": "Sans changement de direction",
+                "2": "Même sens, même file",
+                "3": "Entre 2 files",
+                "4": "En marche arrière",
+                "5": "A contresens",
+                "6": "En franchissant le terre-plein central",
+                "7": "Dans le couloir bus, dans le même sens",
+                "8": "Dans le couloir bus, dans le sens inverse",
+                "9": "En s'insérant",
+                "10": "En faisant demi-tour sur la chaussée",
+                "11": "Changeant de file, à gauche",
+                "12": "Changeant de file, à droite",
+                "13": "Déporté, à gauche",
+                "14": "Déporté, à droite",
+                "15": "Tournant, à gauche",
+                "16": "Tournant, à droite",
+                "17": "Dépassant, à gauche",
+                "18": "Dépassant, à droite",
+                "19": "Traversant la chaussée",
+                "20": "Manoeuvre de stationnement",
+                "21": "Manoeuvre d'évitement",
+                "22": "Ouverture de porte",
+                "23": "Arrêté (hors stationnement)",
+                "24": "En stationnement (avec occupants)",
+                "25": "Circulant sur trottoir",
+                "26": "Autres manoeuvres"
+            }
+        },
+        "motor":{
+            "Name": "Type de motorisation du véhicule",
+            "Description": "Type de motorisation du véhicule",
+            "Catégories":{
+                "-1": "Non renseigné",
+                "0": "Inconnue",
+                "1": "Hydrocarbures",
+                "2": "Hybride électrique",
+                "3": "Electrique",
+                "4": "Hydrogène",
+                "5": "Humaine",
+                "6": "Autre"
+            }
+        },
+        "occutc":{
+            "Name": "Nombre d'occupants dans le transport en commun.",
+            "Description": "Nombre d'occupants dans le transport en commun.",
+            "Catégories": null
+        }
+    }
+}
