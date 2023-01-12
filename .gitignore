@@ -3,6 +3,7 @@
 
 # Mac OS
 .DS_Store
+.ipynb_checkpoints
 
 # Cache files
 *.pyc*
