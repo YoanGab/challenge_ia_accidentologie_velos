@@ -3,9 +3,9 @@ import numpy as np
 
 def features(df):
 
-    features = ["obs", "obsm", "choc", "manv", "grav", "situ", "infra", "surf", "atm", "col", "catr", "circ", "plan", "prof", "vosp"]
+    features = ["obs", "obsm", "choc", "obs2", "obsm2", "choc2", "manv", "grav", "situ", "infra", "surf", "atm", "col", "catr", "circ", "plan", "prof", "vosp"]
     
-    for f in features:
+    for f in features:  
         df[f] = df[f].replace(-1, np.nan)
         df[f] = df[f].astype("Int64")
     return df
@@ -57,13 +57,13 @@ def catv(df : pd.DataFrame):
     def merge_vehicule(row):
         if row['catv'] == 1:
             row['catv'] = row['catv2']
-        elif type(row['catv']) == pd._libs.missing.NAType:
+        elif type(row['catv']) ==  pd._libs.missing.NAType:
             row['catv'] == row['catv2']
         #else (if row catv != 1) okay
         return row
 
     to_drop = 'catv2'
-    catv_dict = {0:np.nan,1:1,2:2,3:3,4:2,5:2,6:2,7:3,8:3,9:3,10:3,11:3,12:3,13:4,14:4,15:4,16:4,17:4,18:5,19:6,20:7,21:7,30:2,31:2,32:2,33:2,34:2,35:3,36:3,37:5,38:5,39:6,40:6,41:3,42:3,43:3,50:1,60:1,80:1,99:7}
+    catv_dict = {0:pd._libs.missing.NAType,1:1,2:2,3:3,4:2,5:2,6:2,7:3,8:3,9:3,10:3,11:3,12:3,13:4,14:4,15:4,16:4,17:4,18:5,19:6,20:7,21:7,30:2,31:2,32:2,33:2,34:2,35:3,36:3,37:5,38:5,39:6,40:6,41:3,42:3,43:3,50:1,60:1,80:1,99:7}
     df = df.apply(merge_vehicule, axis=1)
     df['catv'] = df['catv'].replace(catv_dict)
     df = df.drop(to_drop, axis=1)
@@ -71,7 +71,7 @@ def catv(df : pd.DataFrame):
 
 def drop_features(df : pd.DataFrame):
 
-    df = df.drop(['Unnamed: 0', 'manv', 'manv2', 'larrout', 'vma'], axis=1)
+    df = df.drop(['Unnamed: 0', 'Num_Acc', 'manv', 'manv2', 'larrout', 'vma'], axis=1)
     return df
 
 
