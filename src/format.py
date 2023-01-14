@@ -87,7 +87,7 @@ def drop_features(df : pd.DataFrame):
 def merge_post_format(dataframe : pd.DataFrame, formating_list : list = None):
 
     if formating_list == None:
-        formating_list = [features, date, lum, agg, int_feature, nbv, catv, surf, drop_features]
+        formating_list = [features, date, lum, agg, int_feature, nbv, catv, drop_features]
     df = dataframe.copy()
     for f in formating_list:
         df = df.copy()
