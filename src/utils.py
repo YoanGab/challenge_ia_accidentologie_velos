@@ -158,3 +158,45 @@ def handle_coordinates(df):
     df['longitude'] = df['coordinates'].apply(lambda x: x.split(',')[1]).astype('float')
     
     return df
+
+def create_dataframe_france():
+    df = pd.read_csv(os.path.join("..", "data", "dataset_velo_acc_preprocess.csv"))
+    df = merge_post_format(df)
+    df = df.replace(pd.NA, np.nan)
+    #drop la colonne gps qui contient 80% de NaN et les données présentes ne sont pas intéressantes
+    df.drop(["gps"], axis=1, inplace=True)
+    #df.dropna(subset=['lat', 'long'], axis=0, inplace=True)
+
+    #création d'un mask pour éliminer les latitutes et longitudes qui sont de len inférireur à 5 => pas précises
+    long_mask = df['long'].astype(str).apply(len) >= 5
+    lat_mask = df['lat'].astype(str).apply(len) >= 5
+    mask = np.logical_and(long_mask, lat_mask)
+    df = df[mask]
+
+    #fonction de formatage pour les lat et long, fonction qui prends les points les  extrems de france et divise par 10 les éléments pour
+    #les faire rentrer dans la grille formée par les extremes.
+    def format_lat_long(row):
+        nord = 52
+        sud = 41.1
+        est = 9.56
+        ouest = -4.8
+        lat = float(str(row[0]).replace(',', '.'))
+        lon = float(str(row[1]).replace(',', '.'))
+        i = 0
+        while lat > nord:
+            i += 1
+            lat = lat / 10
+        
+        while lon < ouest or lon > est:
+            lon = lon / 10
+        
+        row[0] = lat
+        row[1] = lon
+            
+        return row
+    #applique la fonction de fromattage sur l'ensemble du dataset
+    df[["lat", "long"]] = df[["lat", "long"]].apply(format_lat_long, axis=1)
+
+    df.reset_index(inplace=True)
+    
+    return df
