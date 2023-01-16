@@ -69,18 +69,20 @@ def catv(df : pd.DataFrame):
     df = df.drop(to_drop, axis=1)
     return df
 
-"""def surf(df : pd.DataFrame):
+def surf(df : pd.DataFrame):
     df['surf'] = df['surf'].replace({1:1,2:2,3:2,4:3,5:4,6:2,7:4,8:5,9:5})
-    return df"""
+    return df
 
-"""def obs(df : pd.DataFrame):
+def obs(df : pd.DataFrame):
     df['obs'] = df['obs'].replace({1:1,2:2,3:3,4:3,5:3,6:6,7:7,8:8,9:9,10:10,11:11,12:12,13:13,14:14,15:15,16:16,17:17})
     df['obs2'] = df['obs2'].replace({1:1,2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,10:10,11:11,12:12,13:13,14:14,15:15,16:16,17:17})
-    return df"""
+    return df
 
 def drop_features(df : pd.DataFrame):
 
-    df = df.drop(['Num_Acc', 'manv', 'manv2', 'larrout', 'vma'], axis=1)
+    df = df.drop(['Num_Acc', 'manv', 'manv2', 'larrout', 'vma', 'num_veh',
+                  'v1', 'v2', 'voie', 'motor', 'id_vehicule', 
+                  'pr', 'pr1', 'lartpc', 'hrmn', 'Unnamed: 0', 'occutc', 'env1'], axis=1)
     return df
 
 

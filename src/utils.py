@@ -31,11 +31,15 @@ def one_hot_encoder(df, categorical_cols):
     return df
 
 def impute(df):
-
     imp = KNNImputer(missing_values = np.nan, n_neighbors=1)
     series_date = df["date"]
-    df = pd.DataFrame(imp.fit_transform(df.drop('date', axis=1)))
-    return pd.concat([df, series_date])
+    series_adr = df["adr"]
+    series_gps = df["gps"]
+    df = pd.DataFrame(imp.fit_transform(df.drop(columns=["date", "adr", "gps"], axis=1)))
+    df = pd.concat([df, series_date])
+    df = pd.concat([df, series_adr])
+    df = pd.concat([df, series_gps])
+    return df
 
 def load_accident(filename="dataset_velo_acc_preprocess.csv", path : list[str] = ['..', 'data'], processed=True):
 
