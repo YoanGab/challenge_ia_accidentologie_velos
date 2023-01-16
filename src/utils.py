@@ -92,8 +92,8 @@ def preprocessing(df):
     df = df.apply(fill_missing_values, axis=1, args=("ame",))
     df = df.apply(fill_missing_values, axis=1, args=("regime",))
 
-    df = df[["code_com_d", "ame_d", "regime_d","date_maj", "latitude_dep", "longitude_dep", "latitude_fin",	"longitude_fin"]]
-    df.columns = ["code_com", "ame", "regime","date_maj", "latitude_dep", "longitude_dep", "latitude_fin",	"longitude_fin"]
+    df = df[["code_com_d", "ame_d", "regime_d","date_maj", "latitude_dep", "longitude_dep", "latitude_fin", "longitude_fin"]]
+    df.columns = ["code_com", "ame", "regime","date_maj", "latitude_dep", "longitude_dep", "latitude_fin", "longitude_fin"]
     df = df.dropna(subset=["code_com"])
     return df
 
