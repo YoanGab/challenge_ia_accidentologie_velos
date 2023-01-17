@@ -25,6 +25,7 @@ def lum(df: pd.DataFrame) -> pd.DataFrame:
 def agg(df: pd.DataFrame) -> pd.DataFrame:
     df["is_in_agg"] = df["agg"].replace({1: 0, 2: 1})
     df = df.drop(columns=["agg"])
+    df = df[df['is_in_agg'] == 1]
     return df
 
 def int_feature(df: pd.DataFrame) -> pd.DataFrame:
@@ -78,18 +79,63 @@ def obs(df : pd.DataFrame):
     df['obs2'] = df['obs2'].replace({1:1,2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,10:10,11:11,12:12,13:13,14:14,15:15,16:16,17:17})
     return df
 
+def lat_long(df : pd.DataFrame):
+
+    #création d'un mask pour éliminer les latitutes et longitudes qui sont de len inférireur à 5 => pas précises
+    long_mask = df['long'].astype(str).apply(len) >= 5
+    lat_mask = df['lat'].astype(str).apply(len) >= 5
+    mask = np.logical_and(long_mask, lat_mask)
+    df =  df[mask]
+
+    #fonction de formatage pour les lat et long, fonction qui prends les points les  extrems de france et divise par 10 les éléments pour
+    #les faire rentrer dans la grille formée par les extremes.
+    def format_lat_long(row):
+        nord = 52
+        sud = 41.1
+        est = 9.56
+        ouest = -4.8
+        lat = float(str(row[0]).replace(',', '.'))
+        lon = float(str(row[1]).replace(',', '.'))
+        i = 0
+        while lat > nord:
+            i += 1
+            lat = lat / 10
+        
+        while lon < ouest or lon > est:
+            lon = lon / 10
+        
+        row[0] = lat
+        row[1] = lon
+            
+        return row
+    #applique la fonction de fromattage sur l'ensemble du dataset
+    df[["lat", "long"]] = df[["lat", "long"]].apply(format_lat_long, axis=1)
+    return df
+
+def com(df : pd.DataFrame):
+    
+    def try_convert(a):
+        a = str(a)
+        try:
+            return int(a[:2])
+        except:
+            return np.nan
+
+    df['com'] = df['com'].apply(lambda a : try_convert(a))
+    df = df.dropna(subset=['com'], axis=0)
+    return df
+
 def drop_features(df : pd.DataFrame):
 
     df = df.drop(['Num_Acc', 'manv', 'manv2', 'larrout', 'vma', 'num_veh',
                   'v1', 'v2', 'voie', 'motor', 'id_vehicule', 
-                  'pr', 'pr1', 'lartpc', 'hrmn', 'Unnamed: 0', 'occutc', 'env1'], axis=1)
+                  'pr', 'pr1', 'lartpc', 'hrmn', 'Unnamed: 0', 'occutc', 'env1', 'gps'], axis=1)
     return df
-
 
 def merge_post_format(dataframe : pd.DataFrame, formating_list : list = None):
 
     if formating_list == None:
-        formating_list = [features, date, lum, agg, int_feature, nbv, catv, drop_features]
+        formating_list = [features, date, lum, agg, int_feature, nbv, catv, lat_long, com, drop_features]
     df = dataframe.copy()
     for f in formating_list:
         df = df.copy()

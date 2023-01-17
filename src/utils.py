@@ -6,6 +6,7 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.impute import KNNImputer
 import numpy as np
 from shapely.geometry import shape
+import geopandas as gpd
 
 def missing(df, detail=True):
     total = 0
@@ -30,7 +31,7 @@ def one_hot_encoder(df, categorical_cols):
     df = pd.concat([df, df_encoded], axis=1)
     return df
 
-def impute(df):
+def impute(df, feature ):
     imp = KNNImputer(missing_values = np.nan, n_neighbors=1)
     series_date = df["date"]
     series_adr = df["adr"]
@@ -41,8 +42,13 @@ def impute(df):
     df = pd.concat([df, series_gps])
     return df
 
-def load_accident(filename="dataset_velo_acc_preprocess.csv", path : list[str] = ['..', 'data'], processed=True):
 
+
+
+def load_accident__do_not_use(filename="dataset_velo_acc_preprocess.csv", path : list[str] = ['..', 'data'], processed=True):
+    """
+    DO NOT USE
+    """
     df = pd.read_csv(os.path.join(*path, "dataset_velo_acc_preprocess.csv"))
 
     if processed == True:
@@ -76,7 +82,7 @@ def create_lat_long(df):
     df = df.drop("coords", axis=1)
     return df
 
-def preprocessing(df):
+def infra_preprocessing(df):
     """
     Drop useless columns (too much nans) and drop some nan lines.
     """
@@ -88,14 +94,36 @@ def preprocessing(df):
             row[f + "_d"] = row[f + '_g']
         return row
 
+    def try_convert(a):
+        a = str(a)
+        try:
+            return int(a[:2])
+        except:
+            return np.nan
+
+    df['code_com_d'] = df['code_com_d'].apply(lambda a : try_convert(a))
+    df['code_com_g'] = df['code_com_g'].apply(lambda a : try_convert(a))
     df = df.apply(fill_missing_values, axis=1, args=("code_com",))
+
+    return df
+
+    """
     df = df.apply(fill_missing_values, axis=1, args=("ame",))
     df = df.apply(fill_missing_values, axis=1, args=("regime",))
 
     df = df[["code_com_d", "ame_d", "regime_d","date_maj", "latitude_dep", "longitude_dep", "latitude_fin", "longitude_fin"]]
-    df.columns = ["code_com", "ame", "regime","date_maj", "latitude_dep", "longitude_dep", "latitude_fin", "longitude_fin"]
-    df = df.dropna(subset=["code_com"])
+    df.columns = ["code_com", "ame", "regime","date_maj", "latitude_dep", "longitude_dep", "latitude_fin", "longitude_fin"] """
+
+    #df = df.dropna(subset=["code_com"])
+    df = df.reset_index()
     return df
+
+def load_infra():
+    df = gpd.read_file("../data/france-20230101-formatted.geojson")
+    df = infra_preprocessing(df)
+    
+    return df
+
 
 def statistic_dataframe(df):
     day_mean = df.groupby(['id_compteur'])['sum_by_day'].mean().astype('int32')
@@ -159,44 +187,35 @@ def handle_coordinates(df):
     
     return df
 
-def create_dataframe_france():
+def load_accident():
+
     df = pd.read_csv(os.path.join("..", "data", "dataset_velo_acc_preprocess.csv"))
     df = merge_post_format(df)
     df = df.replace(pd.NA, np.nan)
-    #drop la colonne gps qui contient 80% de NaN et les données présentes ne sont pas intéressantes
-    df.drop(["gps"], axis=1, inplace=True)
-    #df.dropna(subset=['lat', 'long'], axis=0, inplace=True)
 
-    #création d'un mask pour éliminer les latitutes et longitudes qui sont de len inférireur à 5 => pas précises
-    long_mask = df['long'].astype(str).apply(len) >= 5
-    lat_mask = df['lat'].astype(str).apply(len) >= 5
-    mask = np.logical_and(long_mask, lat_mask)
-    df = df[mask]
 
-    #fonction de formatage pour les lat et long, fonction qui prends les points les  extrems de france et divise par 10 les éléments pour
-    #les faire rentrer dans la grille formée par les extremes.
-    def format_lat_long(row):
-        nord = 52
-        sud = 41.1
-        est = 9.56
-        ouest = -4.8
-        lat = float(str(row[0]).replace(',', '.'))
-        lon = float(str(row[1]).replace(',', '.'))
-        i = 0
-        while lat > nord:
-            i += 1
-            lat = lat / 10
-        
-        while lon < ouest or lon > est:
-            lon = lon / 10
-        
-        row[0] = lat
-        row[1] = lon
-            
-        return row
-    #applique la fonction de fromattage sur l'ensemble du dataset
-    df[["lat", "long"]] = df[["lat", "long"]].apply(format_lat_long, axis=1)
-
-    df.reset_index(inplace=True)
-    
+    #df.dropna(subset=['lat', 'long'], axis=0, inplace=True) 
     return df
+
+
+def closest_point(A, B, C):
+    """
+    Point le plus proche de A appartenant à la droit BC
+    """
+    A = np.array(A)
+    B = np.array(B)
+    C = np.array(C)
+    AB = C - B 
+    AC = A - B
+    dot = np.dot(AB, AC)
+    proj = dot / np.dot(AB, AB)
+    P = B + proj * AB
+    return P
+
+def distance_infra_acc(raw, lat_acc, long_acc):
+    """ 
+    Distance entre l'infrastucture raw et le point d'accident lat_acc, long_acc
+    """
+    point = closest_point([lat_acc,long_acc], [raw['latitude_dep'], raw['longitude_dep']], [raw['latitude_fin'], raw['longitude_fin']])
+    dist = great_circle((lat_acc,long_acc), point).meters
+    return dist
