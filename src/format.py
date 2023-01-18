@@ -90,10 +90,10 @@ def lat_long(df : pd.DataFrame):
     #fonction de formatage pour les lat et long, fonction qui prends les points les  extrems de france et divise par 10 les éléments pour
     #les faire rentrer dans la grille formée par les extremes.
     def format_lat_long(row):
-        nord = 52
+        nord = 51
         sud = 41.1
-        est = 9.56
-        ouest = -4.8
+        est = 8.16
+        ouest = -4.7
         lat = float(str(row[0]).replace(',', '.'))
         lon = float(str(row[1]).replace(',', '.'))
         i = 0
