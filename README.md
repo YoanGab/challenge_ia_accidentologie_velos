@@ -38,3 +38,10 @@ pip install -r requirements.txt
 
 ### Notebook
 Simply launch the notebook on jupyter!
+
+
+## Références
+[1] [A data-driven approach for assessing biking safety in cities](https://epjdatascience.springeropen.com/articles/10.1140/epjds/s13688-021-00265-y)
+[2] [Bases de données annuelles des accidents corporels de la circulation routière - Années de 2005 à 2020](https://www.data.gouv.fr/fr/datasets/bases-de-donnees-annuelles-des-accidents-corporels-de-la-circulation-routiere-annees-de-2005-a-2020/)
+[3] [Base Nationale des Aménagements Cyclables](https://transport.data.gouv.fr/datasets/amenagements-cyclables-france-metropolitaine)
+[4] [Comptages vélo Paris](https://www.data.gouv.fr/fr/datasets/comptage-velo-donnees-compteurs/)
