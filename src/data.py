@@ -19,6 +19,12 @@ class AccidentData:
         # Vérification et contrôle des données
         self.check_and_control_data()
         self.df_final = None
+        self._is_prepared = False
+    
+    def head(self, n: int = 5) -> pd.DataFrame:
+        if not self._is_prepared:
+            self.preprocess_df()
+        return self.df_final.head(n)
     
     def get_json_files(self):
         """
@@ -166,8 +172,11 @@ class AccidentData:
                 # Fusion du DataFrame avec le DataFrame final
                 df_final = pd.merge(df_final, df, on="Num_Acc")
         return df_final
+
+
     
-    def preprocess_df(self, begin=2005, end=2021, check=True, save=True, name="dataset_velo_acc_preprocess.csv"):
+    def preprocess_df(self, begin=2005, end=2021, second_vehicule=False, check=True, save=True, name="dataset_velo_acc_preprocess.csv"):
+        self.second_vehicule = second_vehicule
         path = os.path.join(self.data_dir ,name)
         if os.path.exists(path) and check:
             print("[Check] File already exists! loading file")
@@ -182,27 +191,32 @@ class AccidentData:
             Num_Acc =  self.df_final[self.df_final["catv"] == 1]["Num_Acc"]
             df_velo_acc = self.df_final[self.df_final["Num_Acc"].isin(list(Num_Acc))]
             df_velo_acc.reset_index(drop=True, inplace=True)      
-            
+            self.df_final = df_velo_acc
+
             # Ajout du second véhicule
-            new_cols = ["manv2", "catv2", "obs2", "obsm2", "choc2"]
-            cols = list(df_velo_acc.columns)+new_cols
-            df_velo_acc_veh = pd.DataFrame(columns=cols)
-            index = -1
-            num_acc_inserted: list = []
-            df_velo_acc = df_velo_acc.sort_values("Num_Acc")
-            for _, row in tqdm(df_velo_acc.iterrows()):
-                if row.Num_Acc in num_acc_inserted:
-                    manv2 = row["manv"]
-                    catv2 = row["catv"]
-                    obs2 = row["obs"]
-                    obsm2 = row["obsm"]
-                    choc2 = row["choc"]
-                    df_velo_acc_veh.loc[index, new_cols] = [manv2, catv2, obs2, obsm2, choc2]
-                else:
-                    index += 1
-                    df_velo_acc_veh = df_velo_acc_veh.append({col:val for col,val in zip(cols,list(row.to_numpy())+[None]*5)} , ignore_index=True)
-                    num_acc_inserted.append(row.Num_Acc)
-            self.df_final = df_velo_acc_veh
+            if self.second_vehicule:
+                new_cols = ["manv2", "catv2", "obs2", "obsm2", "choc2"]
+                cols = list(df_velo_acc.columns)+new_cols
+                df_velo_acc_veh = pd.DataFrame(columns=cols)
+                index = -1
+                num_acc_inserted: list = []
+                df_velo_acc = df_velo_acc.sort_values("Num_Acc")
+                for _, row in tqdm(df_velo_acc.iterrows()):
+                    if row.Num_Acc in num_acc_inserted:
+                        manv2 = row["manv"]
+                        catv2 = row["catv"]
+                        obs2 = row["obs"]
+                        obsm2 = row["obsm"]
+                        choc2 = row["choc"]
+                        df_velo_acc_veh.loc[index, new_cols] = [manv2, catv2, obs2, obsm2, choc2]
+                    else:
+                        index += 1
+                        df_velo_acc_veh = df_velo_acc_veh.append({col:val for col,val in zip(cols,list(row.to_numpy())+[None]*5)} , ignore_index=True)
+                        num_acc_inserted.append(row.Num_Acc)
+                self.df_final = df_velo_acc_veh
+            
+            self._is_prepared = True
+
             if save:
                 self.df_final.to_csv(path)
             return self.df_final
