@@ -9,7 +9,7 @@ import shutil
 class AccidentData:
     def __init__(self, load=False):
         # Répertoire où se trouvent les données
-        self.data_dir = os.path.join("..","data")
+        self.data_dir = "data"
         # Liste des catégories de données disponibles
         self.categories = ["usagers", "vehicules", "lieux", "caracteristiques"]
         # Lecture des URLs à partir du fichier JSON
@@ -18,6 +18,7 @@ class AccidentData:
         self.years = list(self.urls["usagers"].keys())
         # Vérification et contrôle des données
         self.check_and_control_data()
+        self.df_merged = None
         self.df_final = None
         self._is_prepared = False
     
@@ -151,13 +152,13 @@ class AccidentData:
         else:
             raise ValueError("La catégorie de données demandée n'est pas valide")
             
-    def get_merge_df(self, begin, end, check=False, name="df_merge.csv"):
+    def get_merge_df(self, begin, end, check=False, save=True, name="df_merge.csv"):
         name = os.path.join(self.data_dir ,name)
         print("[Check] Checking if the file already exists...")
         if os.path.exists(name) and check:
             print("[Check] File already exists! loading file")
-            df_final = pd.read_csv(name, index_col=0)
-            return df_final
+            self.df_merged = pd.read_csv(name, index_col=0)
+            return self.df_merged
         print("[Check] File not found, merging...")
         # Pour chaque catégorie
         for i, cat in enumerate(self.categories):
@@ -167,24 +168,32 @@ class AccidentData:
             if cat == self.categories[0]:
                 df["grav"] = df.grav.map({1:0,2:3,3:2,4:1})
                 df = pd.DataFrame(df.groupby("Num_Acc")["grav"].max()).reset_index()
-                df_final = df
+                self.df_merged = df
             else:
                 # Fusion du DataFrame avec le DataFrame final
-                df_final = pd.merge(df_final, df, on="Num_Acc")
-        return df_final
+                self.df_merged = pd.merge(self.df_merged, df, on="Num_Acc")
+        if save:
+            print("[Check] Saving file...")
+            self.df_merged.to_csv(name)
+        return self.df_merged
 
 
     
     def preprocess_df(self, begin=2005, end=2021, second_vehicule=False, check=True, save=True, name="dataset_velo_acc_preprocess.csv"):
         self.second_vehicule = second_vehicule
         path = os.path.join(self.data_dir ,name)
+        if os.path.exists(os.path.join(self.data_dir ,"df_merge.csv")) and check:
+            print("[Check] File already exists! loading file")
+            self.df_merged = pd.read_csv(os.path.join(self.data_dir ,"df_merge.csv"), index_col=0)
+        else:
+            self.df_merged = self.get_merge_df(begin,end, check=True)
         if os.path.exists(path) and check:
             print("[Check] File already exists! loading file")
             self.df_final = pd.read_csv(path, index_col=0)
             return self.df_final
         elif not os.path.exists(path) and check:
             print("[Preprocessing] File not found, merging...")
-        self.df_final = self.get_merge_df(begin,end)
+        self.df_final = self.get_merge_df(begin,end, check=True)
         if self.df_final is not None:
             print("[Preprocessing] File not found, preprocessing...")
             # Sélection des vélos
