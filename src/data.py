@@ -1,231 +1,170 @@
-
 import pandas as pd
-import json
-import requests
-import os
-from tqdm.notebook import tqdm
-import shutil
+import numpy as np
+from src.data import AccidentData
 
-class AccidentData:
-    def __init__(self, load=False):
-        # Répertoire où se trouvent les données
-        self.data_dir = "data"
-        # Liste des catégories de données disponibles
-        self.categories = ["usagers", "vehicules", "lieux", "caracteristiques"]
-        # Lecture des URLs à partir du fichier JSON
-        self.get_json_files()
-        # Années pour lesquelles il y a des données disponibles
-        self.years = list(self.urls["usagers"].keys())
-        # Vérification et contrôle des données
-        self.check_and_control_data()
-        self.df_merged = None
-        self.df_final = None
-        self._is_prepared = False
-    
+class AccidentDataFormatter:
+    def __init__(self, 
+                 data, 
+                 merged: bool = False,
+                 features_int: list = ["obs", "obsm", "choc", "obs2", "obsm2", "choc2", 
+                                       "manv", "grav", "situ", "infra", "surf", "atm", 
+                                       "col", "catr", "circ", "plan", "prof", "vosp"],
+                features_to_keep=["prof","plan","vosp","grav","lum","dep","com","int",
+                                  "date","lat","long","atm","circ","nbv","larrout",
+                                  "vma","surf","catv","Num_Acc"]
+                ):
+        self.data = data
+        #if not data._is_prepared:
+        #    self.data.preprocess_df()
+
+        if merged:
+            self.df = self.data.df_merged.copy(deep=True)
+            self.df_formatted = self.data.df_merged
+        else:
+            self.df = self.data.df_final.copy(deep=True)
+            self.df_formatted = self.data.df_final
+
+        self.features_int = features_int
+        self.features_to_keep = features_to_keep
+
     def head(self, n: int = 5) -> pd.DataFrame:
-        if not self._is_prepared:
-            self.preprocess_df()
-        return self.df_final.head(n)
+        return self.df_formatted.head(n)
+
+    def format(self) -> pd.DataFrame:
+        self._int_format()
+        self._format_lum()
+        self._format_int()
+        self._format_prof()
+        self._format_atm()
+        self._format_circ()
+        self._format_plan()
+        self._format_vosp()
+        self._format_surf()
+        self._format_date()
+        self._format_agg()
+        self._format_nbv()
+        self._format_lat_long()
+        self._format_com()
+        self.df_formatted = self.df_formatted.reset_index(drop=True)[self.features_to_keep]
+
+    def _int_format(self) -> None:
+        for f in self.features_int:
+            if f[-1] == "2" and self.data.second_vehicule:
+                self.df_formatted[f] = self.df_formatted[f].replace(-1, np.nan)
+                self.df_formatted[f] = self.df_formatted[f].astype("Int64")
+            elif f[-1] != "2":
+                self.df_formatted[f] = self.df_formatted[f].replace(-1, np.nan)
+                self.df_formatted[f] = self.df_formatted[f].astype("Int64")
+
+    def _format_lum(self) -> None:
+        self.df_formatted["lum"] = self.df_formatted["lum"].replace({1: 0, 2: 1, 5: 1, 3: 2, 4: 2})
+
+    def _format_int(self) -> None:
+        self.df_formatted["int"] = self.df_formatted["int"].replace(
+            {-1: np.nan, 0: np.nan, 1: 0, 2: 1, 3: 1, 4: 1, 5: 1, 6: 2, 7: 2, 8: 3, 9: 3}
+        )
+
+    def _format_prof(self) -> None:
+        self.df_formatted["prof"] = self.df_formatted["prof"].replace(
+            {
+                -1: np.nan,
+                0: 1,
+            }
+        )
+
+    def _format_atm(self) -> None:
+        self.df_formatted["atm"] = self.df_formatted["atm"].replace(
+            {-1: np.nan, 1: 0, 2: 1, 8: 1, 7: 2, 5: 2, 3: 3, 4: 3, 6: 3, 9: 3}
+        )
+
+    def _format_circ(self) -> None:
+        self.df_formatted["circ"] = self.df_formatted["circ"].replace({-1: np.nan, 1: 0, 2: 1, 3: 2, 4: 3})
+
+    def _format_plan(self) -> None:
+        self.df_formatted["plan"] = self.df_formatted["plan"].replace(
+            {
+                -1: np.nan,
+                1: 0,
+                2: 1,
+                3: 1,
+                4: 2,
+            }
+        )
+
+    def _format_vosp(self) -> None:
+        self.df_formatted["vosp"] = self.df_formatted["vosp"].replace({-1: np.nan, 0: 0, 3: 1, 2: 2, 1: 3})
+
+    def _format_surf(self) -> None:
+        self.df_formatted["surf"] = self.df_formatted["surf"].replace(
+            {-1: np.nan, 1: 0, 2: 1, 3: 1, 4: 2, 5: 2, 6: 2, 7: 2, 8: 3, 9: 3}
+        )
+
+    def _format_date(self) -> None:
+        self.df_formatted["an"] = self.df_formatted["an"].apply(
+            lambda x: int(x) + 2000 if int(x) < 100 else int(x)
+        )
+        self.df_formatted["date"] = (
+            self.df_formatted["jour"].astype(str)
+            + "/"
+            + self.df_formatted["mois"].astype(str)
+            + "/"
+            + self.df_formatted["an"].astype(str)
+        )
+        self.df_formatted["date"] = pd.to_datetime(self.df_formatted["date"], format="%d/%m/%Y")
+        self.df_formatted["date"] = self.df_formatted["date"].dt.date
+        self.df_formatted = self.df_formatted.drop(columns=["jour", "mois", "an"])
     
-    def get_json_files(self):
-        """
-        Charge les URLs des données dans l'attribut self.urls.
-        """
-        with open(os.path.join(self.data_dir, "accident_corporels_urls.json"),"r") as file:
-            self.urls = json.load(file)
-        with open(os.path.join(self.data_dir, "description_features.json"),"r", encoding="utf-8") as file:
-            self.feat_desc = json.load(file)
+    def _format_agg(self) -> None:
+        self.df_formatted["is_in_agg"] = self.df_formatted["agg"].replace({1: 0, 2: 1})
+        self.df_formatted = self.df_formatted.drop(columns=["agg"])
+
+    def _format_nbv(self) -> None:
+        def remove_outliers_with_nan(df, column):
+            df2 = df[np.isfinite(df[column])]
+            df1 = df[df[column].isna()]
+            q1 = df2[column].quantile(0.25)
+            q3 = df2[column].quantile(0.75)
+            iqr = q3 - q1
+            lower_bound = q1 - (2.5 * iqr)
+            upper_bound = q3 + (2.5 * iqr)
+            df2 = df2[(df2[column] > lower_bound) & (df2[column] < upper_bound)]
+            return pd.concat([df1, df2], axis=0)
+        self.df_formatted["nbv"] = self.df_formatted["nbv"].replace(-1, np.nan)
+        self.df_formatted["nbv"] = self.df_formatted["nbv"].astype("Int64")
+        #self.df_formatted = remove_outliers_with_nan(self.df_formatted, "nbv")
     
-    def download_data(self):
-        """
-        Télécharge les données manquantes.
-        """
-        # S'il y a des fichiers manquants
-        if len(self.filenames) > 0:
-            print("[Check] Checking completed, some data is missing!")
-            print("[Download] Downloading missing data...")
-            # Pour chaque catégorie de données
-            for filename in self.filenames.keys():
-                filename_dir = os.path.join(self.data_dir,filename) # Répertoire où stocker les données
-                print(f"\n[Download] Downloading {filename} files...")
-                # Pour chaque année
-                for i, year in enumerate(self.filenames[filename]):
-                    # Téléchargement des données
-                    data = requests.get(self.urls[filename][year]).text
-
-                     # Création du répertoire s'il n'existe pas
-                    if not os.path.exists(filename_dir):
-                        os.makedirs(filename_dir)
-
-                    # Écriture des données dans un fichier CSV
-                    with open(os.path.join(filename_dir,f"{year}.csv"), 'w', encoding='utf-8') as f:
-                        f.write(data)
-
-                    # Affichage de la barre de progression
-                    bar_length = int(50 * (i+1) / len(self.filenames[filename]))
-                    bar = "#" * bar_length + "-" * (50 - bar_length)
-                    print(f"{i+1}/{len(self.filenames[filename])} [{bar}]", end='\r')
-            print("\n[Download] Download completed!")
-        # S'il n'y a pas de fichiers manquants
-        else:
-            print("[Check] Checking completed, no data is missing!")
-
-    def check_missing_data(self):
-        """
-        Vérifie les données manquantes.
-        """
-        print("[Check] Checking if data is in your computer...")
-        # Dictionnaire des fichiers manquants par catégorie
-        self.filenames = {}
-        # Pour chaque catégorie de données
-        for categorie in self.categories:
-            # Chemin du répertoire de cette catégorie
-            filename_path = os.path.join(self.data_dir,categorie)
-            # Si le répertoire de cette catégorie n'existe pas, tous les fichiers de cette catégorie sont manquants
-            if not os.path.exists(filename_path):
-                self.filenames[categorie] = self.years
-            # Si le répertoire existe, vérification des fichiers manquants
+    def _format_lat_long(self) -> None:
+        def apply_format_lat_long(row):
+            nord = 52
+            sud = 41.1
+            est = 9.56
+            ouest = -4.8
+            if str(row[0]) != "-" and str(row[1]) != "-":
+                lat = float(str(row[0]).replace(',', '.')) if str(row[0])[0] != "-" else float(str(row[0])[1:].replace(',', '.')) * -1
+                lon = float(str(row[1]).replace(',', '.')) if str(row[1])[0] != "-" else float(str(row[1])[1:].replace(',', '.')) * -1
             else:
-                for year in self.years:
-                    # Si le fichier de cette année n'existe pas, il est considéré comme manquant
-                    if not os.path.exists(os.path.join(filename_path, f"{year}.csv")):
-                        # Ajout de l'année au dictionnaire des fichiers manquants
-                        if categorie in self.filenames:
-                            self.filenames[categorie].append(year)
-                        else:
-                            self.filenames[categorie] = [year]
-                            
-    def check_and_control_data(self):
-        """
-        Vérifie les données manquantes et les télécharge si nécessaire.
-        """
-        self.check_missing_data()
-        self.download_data()
-    
-    def reset_db(self):
-        """
-        Réinitialise les données en supprimant tous les répertoires de données et en vérifiant les données manquantes.
-        """
-        print("[Reset] Reseting data...")
-        # Suppression de tous les répertoires de données
-        for categorie in self.categories:
-            categorie_path = os.path.join(self.data_dir, categorie)
-            if os.path.exists(categorie_path):
-                shutil.rmtree(categorie_path, ignore_errors=True) 
-        print("[Reset] Data have been deleted")
-        # Téléchargement des données
-        self.check_and_control_data()
-        print("[Reset] Data have been reset")
-
-    def get_pd_file_from_year(self, cat, begin, end=None, merge=True):
-        """
-        Récupère un DataFrame pandas à partir de l'année demandée.
-        
-        Parameters:
-        cat (str) : Catégorie de données à récupérer.
-        begin (int) : Année de début.
-        end (int) : Année de fin (optionnel, par défaut None).
-        merge (bool) : Si True, fusionne les DataFrames de chaque année en un seul DataFrame. Si False, renvoie une liste de DataFrames.
-        
-        Returns:
-        DataFrame pandas ou liste de DataFrames
-        """
-        # Si la catégorie de données demandée est valide
-        if cat.lower() in self.categories:
-            cat_path = os.path.join(self.data_dir, cat)
-            # Si une seule année est demandée
-            if end == None:
-                # Si l'année demandée existe dans les données
-                if str(begin) in self.years:
-                    # Chargement du fichier CSV en tant que DataFrame pandas
-                    return pd.read_csv(os.path.join(cat_path, f"{begin}.csv"), sep=None, engine='python')
-            # Si une plage d'années est demandée
-            else:
-                if str(begin) in self.years and str(end) in self.years:
-                    list_df = []
-                    for annee in range(begin,end+1):
-                        list_df.append(pd.read_csv(os.path.join(cat_path, f"{str(annee)}.csv"), sep=None, engine='python'))
-                    if merge:
-                        return pd.concat(list_df)
-                    else:
-                        return list_df
-        else:
-            raise ValueError("La catégorie de données demandée n'est pas valide")
+                lat = np.nan
+                lon = np.nan
+            i = 0
+            while lat > nord:
+                i += 1
+                lat = lat / 10
             
-    def get_merge_df(self, begin, end, check=False, save=True, name="df_merge.csv"):
-        name = os.path.join(self.data_dir ,name)
-        print("[Check] Checking if the file already exists...")
-        if os.path.exists(name) and check:
-            print("[Check] File already exists! loading file")
-            self.df_merged = pd.read_csv(name, index_col=0)
-            return self.df_merged
-        print("[Check] File not found, merging...")
-        # Pour chaque catégorie
-        for i, cat in enumerate(self.categories):
-            # Récupération du DataFrame de la catégorie
-            df = self.get_pd_file_from_year(cat=cat, begin=begin, end=end)
-            # Si c'est la première catégorie, le DataFrame final est le DataFrame de la catégorie
-            if cat == self.categories[0]:
-                df["grav"] = df.grav.map({1:0,2:3,3:2,4:1})
-                df = pd.DataFrame(df.groupby("Num_Acc")["grav"].max()).reset_index()
-                self.df_merged = df
-            else:
-                # Fusion du DataFrame avec le DataFrame final
-                self.df_merged = pd.merge(self.df_merged, df, on="Num_Acc")
-        if save:
-            print("[Check] Saving file...")
-            self.df_merged.to_csv(name)
-        return self.df_merged
-
-
-    
-    def preprocess_df(self, begin=2005, end=2021, second_vehicule=False, check=True, save=True, name="dataset_velo_acc_preprocess.csv"):
-        self.second_vehicule = second_vehicule
-        path = os.path.join(self.data_dir ,name)
-        if os.path.exists(os.path.join(self.data_dir ,"df_merge.csv")) and check:
-            print("[Check] File already exists! loading file")
-            self.df_merged = pd.read_csv(os.path.join(self.data_dir ,"df_merge.csv"), index_col=0)
-        else:
-            self.df_merged = self.get_merge_df(begin,end, check=True)
-        if os.path.exists(path) and check:
-            print("[Check] File already exists! loading file")
-            self.df_final = pd.read_csv(path, index_col=0)
-            return self.df_final
-        elif not os.path.exists(path) and check:
-            print("[Preprocessing] File not found, merging...")
-        self.df_final = self.get_merge_df(begin,end, check=True)
-        if self.df_final is not None:
-            print("[Preprocessing] File not found, preprocessing...")
-            # Sélection des vélos
-            Num_Acc =  self.df_final[self.df_final["catv"] == 1]["Num_Acc"]
-            df_velo_acc = self.df_final[self.df_final["Num_Acc"].isin(list(Num_Acc))]
-            df_velo_acc.reset_index(drop=True, inplace=True)      
-            self.df_final = df_velo_acc
-
-            # Ajout du second véhicule
-            if self.second_vehicule:
-                new_cols = ["manv2", "catv2", "obs2", "obsm2", "choc2"]
-                cols = list(df_velo_acc.columns)+new_cols
-                df_velo_acc_veh = pd.DataFrame(columns=cols)
-                index = -1
-                num_acc_inserted: list = []
-                df_velo_acc = df_velo_acc.sort_values("Num_Acc")
-                for _, row in tqdm(df_velo_acc.iterrows()):
-                    if row.Num_Acc in num_acc_inserted:
-                        manv2 = row["manv"]
-                        catv2 = row["catv"]
-                        obs2 = row["obs"]
-                        obsm2 = row["obsm"]
-                        choc2 = row["choc"]
-                        df_velo_acc_veh.loc[index, new_cols] = [manv2, catv2, obs2, obsm2, choc2]
-                    else:
-                        index += 1
-                        df_velo_acc_veh = df_velo_acc_veh.append({col:val for col,val in zip(cols,list(row.to_numpy())+[None]*5)} , ignore_index=True)
-                        num_acc_inserted.append(row.Num_Acc)
-                self.df_final = df_velo_acc_veh
+            while lon < ouest or lon > est:
+                lon = lon / 10
             
-            self._is_prepared = True
+            row[0] = lat
+            row[1] = lon
+                
+            return row
+        self.df_formatted[["lat", "long"]] = self.df_formatted[["lat", "long"]].apply(apply_format_lat_long, axis=1)
 
-            if save:
-                self.df_final.to_csv(path)
-            return self.df_final
+    def _format_com(self) -> None:
+        def try_convert(a):
+            a = str(a)
+            try:
+                return int(a[:2])
+            except:
+                return np.nan
+        self.df_formatted['com'] = self.df_formatted['com'].apply(lambda a : try_convert(a))
+    
