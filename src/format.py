@@ -1,9 +1,11 @@
 import pandas as pd
 import numpy as np
+from src.data import AccidentData
 
 class AccidentDataFormatter:
     def __init__(self, 
                  data, 
+                 merged: bool = False,
                  features_int: list = ["obs", "obsm", "choc", "obs2", "obsm2", "choc2", 
                                        "manv", "grav", "situ", "infra", "surf", "atm", 
                                        "col", "catr", "circ", "plan", "prof", "vosp"],
@@ -12,11 +14,15 @@ class AccidentDataFormatter:
                                   "vma","surf","catv","Num_Acc"]
                 ):
         self.data = data
-        if not data._is_prepared:
-            self.data.preprocess_df()
+        #if not data._is_prepared:
+        #    self.data.preprocess_df()
 
-        self.df = self.data.df_final.copy(deep=True)
-        self.df_formatted = self.data.df_final
+        if merged:
+            self.df = self.data.df_merged.copy(deep=True)
+            self.df_formatted = self.data.df_merged
+        else:
+            self.df = self.data.df_final.copy(deep=True)
+            self.df_formatted = self.data.df_final
 
         self.features_int = features_int
         self.features_to_keep = features_to_keep
@@ -44,6 +50,9 @@ class AccidentDataFormatter:
     def _int_format(self) -> None:
         for f in self.features_int:
             if f[-1] == "2" and self.data.second_vehicule:
+                self.df_formatted[f] = self.df_formatted[f].replace(-1, np.nan)
+                self.df_formatted[f] = self.df_formatted[f].astype("Int64")
+            elif f[-1] != "2":
                 self.df_formatted[f] = self.df_formatted[f].replace(-1, np.nan)
                 self.df_formatted[f] = self.df_formatted[f].astype("Int64")
 
@@ -122,7 +131,7 @@ class AccidentDataFormatter:
             return pd.concat([df1, df2], axis=0)
         self.df_formatted["nbv"] = self.df_formatted["nbv"].replace(-1, np.nan)
         self.df_formatted["nbv"] = self.df_formatted["nbv"].astype("Int64")
-        self.df_formatted = remove_outliers_with_nan(self.df_formatted, "nbv")
+        #self.df_formatted = remove_outliers_with_nan(self.df_formatted, "nbv")
     
     def _format_lat_long(self) -> None:
         def apply_format_lat_long(row):
@@ -158,7 +167,7 @@ class AccidentDataFormatter:
             except:
                 return np.nan
         self.df_formatted['com'] = self.df_formatted['com'].apply(lambda a : try_convert(a))
-    
+        
 def features(df):
 
     features = ["obs", "obsm", "choc", "obs2", "obsm2", "choc2", "manv", "grav", "situ", "infra", "surf", "atm", "col", "catr", "circ", "plan", "prof", "vosp"]
